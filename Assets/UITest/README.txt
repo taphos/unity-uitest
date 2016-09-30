@@ -1,6 +1,6 @@
-# Unity UI Test Automation Framework
+UI test automation framework
 
-# Features
+Features
 
 * Allows to write automated tests that drive the game in a way similar to how a user would
 * Integrated with Unity UI solution, can easily be integrated with custom solutions like NGUI or EZGUI
@@ -9,7 +9,7 @@
 * Includes lightweight dependency injection framework for object mocking
 
 
-# Running
+Running
 
 * To run tests in Editor open scene Assets/UITest/Tests.unit and click Play
 * Click TestRunner GameObject to see the test report in realtime
@@ -17,7 +17,7 @@
 * To run on device just set Tests scene as a first one before building
 
 
-# Implementing tests
+Implementing tests
 
 * To add a new test create a new class anywhere in the project extending UITest
 * Use UITest, UISetUp and UITearDown attributes same way as you would in Unit tests
