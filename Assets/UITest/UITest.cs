@@ -66,7 +66,7 @@ public class UITest : MonoBehaviour
 
     protected Coroutine WaitFor(Condition condition)
     {
-        return StartCoroutine(WaitForInternal(condition));
+        return StartCoroutine(WaitForInternal(condition, Environment.StackTrace));
     }
                 
     protected Coroutine LoadScene(string name)
@@ -107,38 +107,18 @@ public class UITest : MonoBehaviour
         return StartCoroutine(PressInternal(o));
     }
 
-    IEnumerator WaitForInternal(Condition condition)
+    IEnumerator WaitForInternal(Condition condition, string stackTrace)
     {
         float time = 0;
         while (!condition.Satisfied())
         {
             if (time > WaitTimeout)
-                throw new Exception("Operation timed out: " + condition + "\n\n" + GetSceneHierarchy());            
+                throw new Exception("Operation timed out: " + condition + "\n" + stackTrace);            
             for (int i = 0; i < WaitIntervalFrames; i++) {
                 time += Time.unscaledDeltaTime;
                 yield return null;
             }
         }
-    }
-
-    string GetSceneHierarchy()
-    {
-#if UNITY_EDITOR 
-        return "";
-#else
-        var roots = UnityEngine.Object.FindObjectsOfType<Transform>().Where(t => t.parent == null);
-        string s = "";
-        foreach (Transform t in roots) PrintHierarchy(ref s, t, 0);
-        return s;
-#endif
-    }
-
-    void PrintHierarchy(ref string s, Transform root, int depth)
-    {
-        s += new string(' ', depth * 2) + root.name;
-        if (!root.gameObject.activeInHierarchy) s += " (inactive)";
-        s += "\n";
-        foreach (Transform t in root) PrintHierarchy(ref s, t, depth + 1);
     }
 
     IEnumerator PressInternal(string buttonName)
