@@ -24,6 +24,23 @@
 * Checkout example in Assets/UITest/Examples/UITestExample.cs
 
 
+# API
+
+API is designed to be readable as a natural language so it can be understood by non technical people too. All API calls are designed to wait until its function could be executed with a certain timeout.
+
+* Press(<GameObjectName>) - Simulates a button press. If an object with a given name is not found in the scene, it waits for it to appear.
+* LoadScene(<SceneName>) - Load new scene and wait until scene is fully loaded.
+* AssertLabel(<GameObjectName>, <Text>) - Asserts text value, waits until value is changed.
+* WaitFor(<Condition>) - Generic method to wait until given condition is satisfied.
+* WaitFor(new LabelTextAppeared(<GameObjectName>, <Text>)) - Wait for label with given text to appear
+* WaitFor(new SceneLoaded(<SceneName>)) - Wait until scene is fully loaded
+* WaitFor(new ObjectAppeared(<GameObjectName>)) - Wait for object with given name to appear
+* WaitFor(new ObjectAppeared<ObjectType>()) - Wait for object with component of given type to appear
+* WaitFor(new ObjectDisappeared(<GameObjectName>)) - Wait for object with given name to disappear
+* WaitFor(new ObjectDisappeared<ObjectType>()) - Wait for object with component of given type to disappear
+* WaitFor(new BoolCondition(<BoolFunction>)) - Generic condition is satisfied when a given bool expression becomes true
+
+
 Have fun testing ;)
 
 Filipp Keks
