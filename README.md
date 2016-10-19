@@ -11,7 +11,7 @@
 
 # Running
 
-* To run tests in Editor open scene Assets/UITest/Tests.unit and click Play
+* To run tests in Editor open scene Assets/UITest/Example/TestRunner.unit and click Play
 * Click TestRunner GameObject to see the test report in realtime
 * Use filter field to run tests partially
 * To run on device just set Tests scene as a first one before building
