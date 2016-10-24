@@ -12,7 +12,12 @@ public class UITestExample : UITest
         mockNetworkClient = new MockNetworkClient();
         // Replace the real networkClient with mock object, it will be injected later into FirstScreen component
         DependencyInjector.ReplaceComponent<NetworkClient>(mockNetworkClient);
+
+#if UNITY_EDITOR
+        yield return LoadSceneByPath("Assets/UITest/Examples/TestableGameScene.unity");
+#elif
         yield return LoadScene("TestableGameScene");
+#endif
     }
 
     [UITest]

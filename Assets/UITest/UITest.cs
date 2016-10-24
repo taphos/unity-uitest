@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 using System;
+using System.IO;
 using System.Reflection;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -74,6 +75,25 @@ public class UITest : MonoBehaviour
         return StartCoroutine(LoadSceneInternal(name));
     }
 
+    IEnumerator LoadSceneInternal(string name)
+    {                      
+        SceneManager.LoadScene(name);
+        yield return WaitFor(new SceneLoaded(name));
+    }
+
+#if UNITY_EDITOR
+    protected Coroutine LoadSceneByPath(string path)
+    {
+        return StartCoroutine(LoadSceneByPathInternal(path));
+    }
+
+    IEnumerator LoadSceneByPathInternal(string path)
+    {                      
+        UnityEditor.EditorApplication.LoadLevelInPlayMode(path);
+        yield return WaitFor(new SceneLoaded(Path.GetFileNameWithoutExtension(path)));
+    }
+#endif
+
     protected Coroutine AssertLabel(string id, string text)
     {
         return StartCoroutine(AssertLabelInternal(id, text));
@@ -135,13 +155,7 @@ public class UITest : MonoBehaviour
         ExecuteEvents.Execute(o, new PointerEventData(EventSystem.current), ExecuteEvents.pointerClickHandler);
         yield return null;
     }
-
-    IEnumerator LoadSceneInternal(string name)
-    {
-        SceneManager.LoadScene(name);
-        yield return WaitFor(new SceneLoaded(name));
-    }
-
+                
     IEnumerator AssertLabelInternal(string id, string text)
     {
         yield return WaitFor(new LabelTextAppeared(id, text));
