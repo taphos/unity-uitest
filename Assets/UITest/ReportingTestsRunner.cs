@@ -53,9 +53,12 @@ public class ReportingTestsRunner : TestsRunner
 
         timeStarted = DateTime.Now;
 
-        if (Directory.Exists(TestReportPath))
-            Directory.Delete(TestReportPath, true);
-        Directory.CreateDirectory(TestReportPath);
+        if (!Application.isMobilePlatform)
+        {
+            if (Directory.Exists(TestReportPath))
+                Directory.Delete(TestReportPath, true);
+            Directory.CreateDirectory(TestReportPath);
+        }
     }
 
     protected override IEnumerator RunUIFixtures()
@@ -76,8 +79,9 @@ public class ReportingTestsRunner : TestsRunner
         Debug.LogFormat("TEST FIXTURE END: {0} ({1}s)\n{2}",
             fixtureType,
             (timeEnded - timeStarted).TotalSeconds.ToString("0.000"),
-            Delimeter);            
-        ReportXml(fixtureType, timeStarted, timeEnded);
+            Delimeter);       
+        if (!Application.isMobilePlatform)
+            ReportXml(fixtureType, timeStarted, timeEnded);
     }
 
     public void ReportXml(Type fixtureType, DateTime timeStarted, DateTime timeEnded)
@@ -190,15 +194,15 @@ public class ReportingTestsRunner : TestsRunner
         if (!testReports.ContainsKey(fixtureType)) testReports[fixtureType] = new List<TestReport>();
         var report = new TestReport();
         report.name = CurrentFullTestName;
-        testReports[fixtureType].Add(report);
-        var output = File.CreateText(GetReportLogFilePath(report.name));
+        testReports[fixtureType].Add(report);        
+        var output = Application.isMobilePlatform ? null : File.CreateText(GetReportLogFilePath(report.name));
 
         Application.LogCallback logReceived = (condition, stackTrace, type) => {
             if ((type == LogType.Error || type == LogType.Exception) && !UnityInternalError(condition)) {
                 report.failedMessage = condition;
                 report.failedStackTrace = stackTrace;
             }
-            output.WriteLine(DateTime.Now.ToString("HH:mm:ss.fff") + " " + type.ToString().PadRight(10) + ": " + condition);
+            if (output != null) output.WriteLine(DateTime.Now.ToString("HH:mm:ss.fff") + " " + type.ToString().PadRight(10) + ": " + condition);
             if (type != LogType.Log) output.WriteLine(stackTrace);
         };
         Application.logMessageReceived += logReceived;
@@ -206,7 +210,7 @@ public class ReportingTestsRunner : TestsRunner
         yield return StartCoroutine(base.RunUITest(fixtureType, method));
 
         Application.logMessageReceived -= logReceived;
-        output.Close();
+        if (output != null) output.Close();
         report.duration = (float)(DateTime.Now - timeStarted).TotalSeconds;
         Debug.LogFormat("TEST {0}: {1} ({2}s)\n",
             (report.Failed ? "FAILED" : "PASSED"),
