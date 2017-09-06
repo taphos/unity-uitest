@@ -3,7 +3,7 @@
 This version of framework is supported by ***Unity 2017*** and later.
 
 Comparing to the previous version it is integrated with Unity PlayMode Test Runner instead of custom runner implementation.
-Note that running PlayMode tests is not currently supported by Unity. https://docs.unity3d.com/Manual/testing-editortestsrunner.html
+Note that running PlayMode tests from command line is not currently supported by Unity. https://docs.unity3d.com/Manual/testing-editortestsrunner.html
 
 If you would like to execute tests from command line or write tests for older Unity versions check out previous version of the framework https://github.com/taphos/unity-uitest/tree/1.0
 
