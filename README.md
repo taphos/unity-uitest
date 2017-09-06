@@ -1,26 +1,29 @@
 # Unity UI Test Automation Framework
 
+This version of framework is supported by Unity 2017 and later
+Comparing to the previous version it is integrated with Unity PlayMode Test Runner instead of custom runner implementation
+If you would like to write tests for older Unity versions check out previous version of the framework https://github.com/taphos/unity-uitest/tree/1.0
+
 # Features
 
 * Allows to write automated tests that drive the game in a way similar to how a user would
 * Integrated with Unity UI solution, can easily be integrated with custom solutions like NGUI or EZGUI
-* Tests can be executed in Editor or Unity Player (tested Android, iOS and Standalone)
-* Test reports in Editor GUI, Console and XML files (JUnit format)
+* Integrated with Unity Test Runner
+* Tests can be executed in Unity Player or Editor (PlayMode)
 * Includes lightweight dependency injection framework for object mocking
 
 
 # Running
 
-* To run tests in Editor open scene Assets/UITest/Example/TestRunner.unit and click Play
-* Click TestRunner GameObject to see the test report in realtime
-* Use filter field to run tests partially
-* To run on device just set Tests scene as a first one before building
+* In Editor Open Window->Test Runner
+* Switch to PlayMode tab  
+* Click Run
 
 
 # Implementing tests
 
 * To add a new test create a new class anywhere in the project extending UITest
-* Use UITest, UISetUp and UITearDown attributes same way as you would in Unit tests
+* Use UnityTest, SetUp and TearDown attributes same way as you would in Unit tests
 * Checkout example in Assets/UITest/Examples/UITestExample.cs
 
 
@@ -41,7 +44,7 @@ API is designed to be readable as a natural language so it can be understood by 
 * `WaitFor(new BoolCondition(<BoolFunction>))` - Generic condition is satisfied when a given bool expression becomes true
 
 
+Check out my blog post for in depth description http://blog.filippkeks.com/2016/11/21/why-game-developers-are-afraid-of-test-automation.html
 Have fun testing ;)
 
 Filipp Keks
-

@@ -2,13 +2,14 @@
 
 This version of framework is supported by Unity 2017 and later
 Comparing to the previous version it is integrated with Unity PlayMode Test Runner instead of custom runner implementation
+If you would like to write tests for older Unity versions check out previous version of the framework https://github.com/taphos/unity-uitest/tree/1.0
 
 # Features
 
 * Allows to write automated tests that drive the game in a way similar to how a user would
 * Integrated with Unity UI solution, can easily be integrated with custom solutions like NGUI or EZGUI
 * Integrated with Unity Test Runner
-* Tests can be executed in Editor or Unity Player
+* Tests can be executed in Unity Player or Editor (PlayMode)
 * Includes lightweight dependency injection framework for object mocking
 
 
@@ -47,4 +48,3 @@ Check out my blog post for in depth description http://blog.filippkeks.com/2016/
 Have fun testing ;)
 
 Filipp Keks
-
