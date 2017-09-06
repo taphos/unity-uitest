@@ -1,28 +1,25 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEngine.Assertions;
+using NUnit.Framework;
+using UnityEngine.TestTools;
 
 public class UITestExample : UITest
 {
     MockNetworkClient mockNetworkClient;
 
-    [UISetUp]
-    public IEnumerable Init()
+    [SetUp]
+    public void Init()
     {
         mockNetworkClient = new MockNetworkClient();
         // Replace the real networkClient with mock object, it will be injected later into FirstScreen component
         DependencyInjector.ReplaceComponent<NetworkClient>(mockNetworkClient);
-
-#if UNITY_EDITOR
-        yield return LoadSceneByPath("Assets/UITest/Examples/TestableGameScene.unity");
-#elif
-        yield return LoadScene("TestableGameScene");
-#endif
     }
 
-    [UITest]
-    public IEnumerable SecondScreenCanBeOpenedFromTheFirstOne()
-    {
+    [UnityTest]
+    public IEnumerator SecondScreenCanBeOpenedFromTheFirstOne()
+    {        
+        yield return LoadScene("TestableGameScene");
+        
         // Wait until object with given component appears in the scene
         yield return WaitFor(new ObjectAppeared<FirstScreen>());
 
@@ -40,9 +37,11 @@ public class UITestExample : UITest
         yield return WaitFor(new ObjectDisappeared<SecondScreen>());
     }
 
-    [UITest]
-    public IEnumerable SuccessfulNetworkResponseIsDisplayedOnTheFirstScreen()
+    [UnityTest]
+    public IEnumerator SuccessfulNetworkResponseIsDisplayedOnTheFirstScreen()
     {
+        yield return LoadScene("TestableGameScene");
+        
         yield return WaitFor(new ObjectAppeared<FirstScreen>());
 
         // Predefine the mocked server response
@@ -57,11 +56,13 @@ public class UITestExample : UITest
         Assert.AreEqual(mockNetworkClient.mockRequest, "i_need_data");
     }
 
-    [UITest]
-    public IEnumerable FailingBoolCondition()
+    [UnityTest]
+    public IEnumerator FailingBoolCondition()
     {
+        yield return LoadScene("TestableGameScene");
+        
         yield return WaitFor(new ObjectAppeared("FirstScreen"));
-        var s = FindObjectOfType<FirstScreen>();
+        var s = Object.FindObjectOfType<FirstScreen>();
 
         // Wait until FirstScene component is disabled, this line will fail by timeout
         // BoolCondition can be used to wait until any condition is satisfied
@@ -69,3 +70,4 @@ public class UITestExample : UITest
     }
 }
 
+ 

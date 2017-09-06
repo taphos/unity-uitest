@@ -1,130 +1,74 @@
-using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 using System;
 using System.IO;
-using System.Reflection;
-using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
-[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-public sealed class UITestAttribute : Attribute
+public class UITest
 {
-}
-
-[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-public sealed class UISetUpAttribute : Attribute
-{
-}
-
-[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-public sealed class UITearDownAttribute : Attribute
-{
-}
-
-public class UITest : MonoBehaviour
-{
-    void Awake()
-    {
-        DontDestroyOnLoad(gameObject);
-    }
-
-    public IEnumerator RunTest(MethodInfo method)
-    {
-        yield return null; // wait for destroy to be executed
-
-        yield return StartCoroutine(Run(typeof(UISetUpAttribute)));
-        yield return StartCoroutine(InvokeMethod(method));
-        yield return StartCoroutine(Run(typeof(UITearDownAttribute)));
-
-        Destroy(gameObject);
-    }
-
-    protected IEnumerator InvokeMethod(MethodInfo method)
-    {
-        var enumerable = (IEnumerable) method.Invoke(this, null);
-        if (enumerable != null)
-        {
-            foreach (YieldInstruction y in enumerable)
-                yield return y;
-        }
-    }
-
-    IEnumerator Run(Type type)
-    {
-        foreach(MethodInfo method in GetType().GetMethods())
-        {
-            if (Attribute.IsDefined(method, type))
-                yield return StartCoroutine(InvokeMethod(method));
-        }
-    }
-
     const float WaitTimeout = 2;
     const float WaitIntervalFrames = 10;
+    static MonoBehaviour mb;
+
+    public class MB : MonoBehaviour
+    {
+    }
+
+    protected void CreateMonoBehaviour()
+    {
+        if (mb == null)
+        {
+            var go = new GameObject("mb");
+            GameObject.DontDestroyOnLoad(go);
+            go.hideFlags = HideFlags.HideAndDontSave;
+            mb = go.AddComponent<MB>();            
+        }
+    }
 
     protected Coroutine WaitFor(Condition condition)
     {
-        return StartCoroutine(WaitForInternal(condition, Environment.StackTrace));
+        CreateMonoBehaviour();        
+        return mb.StartCoroutine(WaitForInternal(condition, Environment.StackTrace));
     }
                 
     protected Coroutine LoadScene(string name)
     {
-        return StartCoroutine(LoadSceneInternal(name));
+        CreateMonoBehaviour();
+        return mb.StartCoroutine(LoadSceneInternal(name));
     }
 
     IEnumerator LoadSceneInternal(string name)
-    {                      
+    {           
+#if UNITY_EDITOR
+        if (name.Contains(".unity"))
+        {
+            UnityEditor.EditorApplication.LoadLevelInPlayMode(name);
+            yield return WaitFor(new SceneLoaded(Path.GetFileNameWithoutExtension(name)));
+            yield break;
+        }
+#endif        
         SceneManager.LoadScene(name);
         yield return WaitFor(new SceneLoaded(name));
     }
 
-#if UNITY_EDITOR
-    protected Coroutine LoadSceneByPath(string path)
-    {
-        return StartCoroutine(LoadSceneByPathInternal(path));
-    }
-
-    IEnumerator LoadSceneByPathInternal(string path)
-    {                      
-        UnityEditor.EditorApplication.LoadLevelInPlayMode(path);
-        yield return WaitFor(new SceneLoaded(Path.GetFileNameWithoutExtension(path)));
-    }
-#endif
-
     protected Coroutine AssertLabel(string id, string text)
     {
-        return StartCoroutine(AssertLabelInternal(id, text));
-    }
-
-    T FindUIElement<T>(string name) where T : Component
-    {
-        T e = FindUIElementOrNull<T>(name);
-        if (e == null) throw new Exception(typeof(T) + " not found: " + name);
-        return e;
-    }
-
-    T FindUIElementOrNull<T>(string name) where T : Component
-    {
-        var children = FindObjectsOfType<T>();
-        foreach (T element in children)
-        {
-            if (element != null && element.name != null && element.name.Equals(name))
-                return element;
-        }
-        return null;
+        CreateMonoBehaviour();
+        return mb.StartCoroutine(AssertLabelInternal(id, text));
     }
 
     protected Coroutine Press(string buttonName)
     {
-        return StartCoroutine(PressInternal(buttonName));
+        CreateMonoBehaviour();
+        return mb.StartCoroutine(PressInternal(buttonName));
     }
 
     protected Coroutine Press(GameObject o)
     {
-        return StartCoroutine(PressInternal(o));
+        CreateMonoBehaviour();
+        return mb.StartCoroutine(PressInternal(o));
     }
 
     IEnumerator WaitForInternal(Condition condition, string stackTrace)
@@ -187,24 +131,6 @@ public class UITest : MonoBehaviour
         {
             return GetType() + " '" + param + "'";
         }
-
-        protected T FindUIElement<T>(string name) where T : Component
-        {
-            T e = FindUIElementOrNull<T>(name);
-            if (e == null) throw new Exception(typeof(T) + " not found: " + name);
-            return e;
-        }
-
-        protected T FindUIElementOrNull<T>(string name) where T : Component
-        {
-            var children = FindObjectsOfType<T>();
-            foreach (T element in children)
-            {
-                if (element != null && element.name != null && element.name.Equals(name))
-                    return element;
-            }
-            return null;
-        }
     }
 
     protected class LabelTextAppeared : Condition
@@ -258,7 +184,7 @@ public class UITest : MonoBehaviour
     {
         public override bool Satisfied()
         {
-            var obj = FindObjectOfType(typeof (T)) as T;
+            var obj = GameObject.FindObjectOfType(typeof (T)) as T;
             return obj != null && obj.gameObject.activeInHierarchy;
         }
     }
@@ -267,7 +193,7 @@ public class UITest : MonoBehaviour
     {
         public override bool Satisfied()
         {
-            var obj = FindObjectOfType(typeof(T)) as T;
+            var obj = GameObject.FindObjectOfType(typeof(T)) as T;
             return obj == null || !obj.gameObject.activeInHierarchy;
         }
     }
