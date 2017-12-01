@@ -27,16 +27,20 @@ public class UITest
         }
     }
 
+    protected Coroutine StartCoroutine(IEnumerator enumerator)
+    {
+        CreateMonoBehaviour();
+        return mb.StartCoroutine(enumerator);
+    }
+
     protected Coroutine WaitFor(Condition condition)
     {
-        CreateMonoBehaviour();        
-        return mb.StartCoroutine(WaitForInternal(condition, Environment.StackTrace));
+        return StartCoroutine(WaitForInternal(condition, Environment.StackTrace));
     }
                 
     protected Coroutine LoadScene(string name)
     {
-        CreateMonoBehaviour();
-        return mb.StartCoroutine(LoadSceneInternal(name));
+        return StartCoroutine(LoadSceneInternal(name));
     }
 
     IEnumerator LoadSceneInternal(string name)
@@ -55,20 +59,17 @@ public class UITest
 
     protected Coroutine AssertLabel(string id, string text)
     {
-        CreateMonoBehaviour();
-        return mb.StartCoroutine(AssertLabelInternal(id, text));
+        return StartCoroutine(AssertLabelInternal(id, text));
     }
 
     protected Coroutine Press(string buttonName)
     {
-        CreateMonoBehaviour();
-        return mb.StartCoroutine(PressInternal(buttonName));
+        return StartCoroutine(PressInternal(buttonName));
     }
 
     protected Coroutine Press(GameObject o)
     {
-        CreateMonoBehaviour();
-        return mb.StartCoroutine(PressInternal(o));
+        return StartCoroutine(PressInternal(o));
     }
 
     IEnumerator WaitForInternal(Condition condition, string stackTrace)
